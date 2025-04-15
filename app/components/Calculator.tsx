@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import "./Calculator.style.css";
 
 export default function Calculator() {
@@ -18,17 +18,36 @@ export default function Calculator() {
   const revenueFillRef = useRef<HTMLDivElement>(null);
   const revenueThumbRef = useRef<HTMLDivElement>(null);
 
-  const currentRoas = 1.12;
-  const improvedAdSpend = 166000;
-  const improvedRevenueBase = 284350;
-  const improvedRoas = 1.31;
-  const adSpendSavings = 34000;
-  const revenueGain = 64350;
-  const totalSavings = 75000;
+  const currentRoas = useMemo(() => {
+    if (adSpend === 0) return 0;
+    const rawRoas = revenue / adSpend;
+    return Math.round(rawRoas * 100) / 100;
+  }, [revenue, adSpend]);
 
-  const adSpendBarWidths = { currentWidth: "70%", improvedWidth: "55%" };
-  const revenueBarWidths = { currentWidth: "55%", improvedWidth: "75%" };
-  const roasBarWidths = { currentWidth: "50%", improvedWidth: "75%" };
+  const improvedAdSpend = useMemo(() => {
+    return adSpend * 0.83;
+  }, [adSpend]);
+
+  const improvedRevenueBase = useMemo(() => {
+    return revenue * 1.2925;
+  }, [revenue]);
+
+  const improvedRoas = useMemo(() => {
+    if (currentRoas === 0) return 0;
+    return Math.round(currentRoas * 1.17 * 100) / 100;
+  }, [currentRoas]);
+
+  const adSpendSavings = useMemo(() => {
+    return adSpend - improvedAdSpend;
+  }, [adSpend, improvedAdSpend]);
+
+  const revenueGain = useMemo(() => {
+    return improvedRevenueBase - revenue;
+  }, [improvedRevenueBase, revenue]);
+
+  const totalSavings = useMemo(() => {
+    return adSpendSavings + revenueGain * 0.64;
+  }, [adSpendSavings, revenueGain]);
 
   const snapPoints = [125000, 250000, 375000];
 
@@ -59,11 +78,7 @@ export default function Calculator() {
     updateSliderUI();
   }, [adSpend, revenue]);
 
-  const updateThumbPosition = (
-    type: "adSpend" | "revenue",
-    value: number,
-    isDragging: boolean = false
-  ) => {
+  const updateThumbPosition = (type: "adSpend" | "revenue", value: number) => {
     const percentage = (value / 500000) * 100;
     const fillRef = type === "adSpend" ? adSpendFillRef : revenueFillRef;
     const thumbRef = type === "adSpend" ? adSpendThumbRef : revenueThumbRef;
@@ -88,14 +103,24 @@ export default function Calculator() {
     return value.toFixed(2);
   };
 
+  const adSpendBarWidths = useMemo(() => {
+    return { currentWidth: "70%", improvedWidth: "55%" };
+  }, []);
+
+  const revenueBarWidths = useMemo(() => {
+    return { currentWidth: "55%", improvedWidth: "75%" };
+  }, []);
+
+  const roasBarWidths = useMemo(() => {
+    return { currentWidth: "50%", improvedWidth: "75%" };
+  }, []);
+
   const handleThumbMouseDown = (
     e: React.MouseEvent | React.TouchEvent,
     type: "adSpend" | "revenue"
   ) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const initialValue = type === "adSpend" ? adSpend : revenue;
 
     if (type === "adSpend") {
       setIsDraggingAdSpend(true);
@@ -124,10 +149,10 @@ export default function Calculator() {
 
       if (type === "adSpend") {
         setAdSpend(newValue);
-        updateThumbPosition("adSpend", newValue, true);
+        updateThumbPosition("adSpend", newValue);
       } else {
         setRevenue(newValue);
-        updateThumbPosition("revenue", newValue, true);
+        updateThumbPosition("revenue", newValue);
       }
     };
 
