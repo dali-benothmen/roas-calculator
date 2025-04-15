@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 
 export interface SliderProps {
   value: number;
@@ -39,19 +39,22 @@ const Slider: React.FC<SliderProps> = ({
     return val;
   };
 
-  const updateThumbPosition = (newValue: number) => {
-    const percentage = ((newValue - min) / (max - min)) * 100;
+  const updateThumbPosition = useCallback(
+    (newValue: number) => {
+      const percentage = ((newValue - min) / (max - min)) * 100;
 
-    if (fillRef.current && thumbRef.current && rangeRef.current) {
-      fillRef.current.style.width = `${percentage}%`;
-      thumbRef.current.style.left = `${percentage}%`;
-      rangeRef.current.value = percentage.toString();
-    }
-  };
+      if (fillRef.current && thumbRef.current && rangeRef.current) {
+        fillRef.current.style.width = `${percentage}%`;
+        thumbRef.current.style.left = `${percentage}%`;
+        rangeRef.current.value = percentage.toString();
+      }
+    },
+    [min, max, fillRef, thumbRef, rangeRef]
+  );
 
   useEffect(() => {
     updateThumbPosition(value);
-  }, [value]);
+  }, [value, updateThumbPosition]);
 
   const handleThumbMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
@@ -69,7 +72,7 @@ const Slider: React.FC<SliderProps> = ({
           ? moveEvent.clientX - sliderRect.left
           : (moveEvent as TouchEvent).touches[0].clientX - sliderRect.left;
 
-      let percentage = Math.max(
+      const percentage = Math.max(
         0,
         Math.min(100, (offsetX / sliderRect.width) * 100)
       );

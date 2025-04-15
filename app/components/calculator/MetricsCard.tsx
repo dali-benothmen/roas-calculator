@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
 
 export interface MetricsCardProps {
   title: string;
@@ -21,6 +24,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   improvedValue,
   improvedWidth,
 }) => {
+  const [iconError, setIconError] = useState(false);
+
   return (
     <div className="relative h-[100px] lg:h-[121px] mb-2 w-full">
       <div className="absolute left-0 right-0 top-0 bottom-0 bg-gradient-to-r from-[rgba(133,129,129,0.05)] to-[rgba(170,170,170,0.25)] opacity-50 border border-[#6f6e6e] backdrop-filter backdrop-blur-[4px] rounded-[18px] lg:rounded-[24px]"></div>
@@ -59,11 +64,21 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             }}
           >
             <div className="h-full">
-              <img
-                src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d0_Group%209967.svg"
-                alt=""
-                className="h-full w-auto object-contain absolute left-0"
-              />
+              {!iconError ? (
+                <Image
+                  src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d0_Group%209967.svg"
+                  alt="Improved metric indicator"
+                  width={25}
+                  height={25}
+                  className="h-full w-auto object-contain absolute left-0"
+                  onError={() => setIconError(true)}
+                  unoptimized
+                />
+              ) : (
+                <div className="w-4 h-full bg-blue-300 absolute left-0 flex items-center justify-center">
+                  <span className="text-xs text-white">→</span>
+                </div>
+              )}
             </div>
           </div>
 

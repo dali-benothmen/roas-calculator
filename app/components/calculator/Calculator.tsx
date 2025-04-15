@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import Slider from "@/app/lib/components/Slider";
 import MetricsCard from "./MetricsCard";
 import RoasDisplay from "./RoasDisplay";
@@ -19,6 +20,8 @@ import "./styles.css";
 export default function Calculator() {
   const [adSpend, setAdSpend] = useState(200000);
   const [revenue, setRevenue] = useState(220000);
+  const [imageError, setImageError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   const currentRoas = useMemo(() => {
     if (adSpend === 0) return 0;
@@ -113,14 +116,19 @@ export default function Calculator() {
       </div>
 
       <div className="absolute w-[60%] h-[101%] top-[-0.5%] z-[1] right-[-1px] hidden lg:block">
-        <img
-          src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d2_Group%209969.webp"
-          loading="lazy"
-          sizes="(max-width: 991px) 100vw, (max-width: 1439px) 54vw, 766.796875px"
-          srcSet="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d2_Group%25209969-p-500.webp 500w, https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d2_Group%209969.webp 749w"
-          alt=""
-          className="w-full h-full"
-        />
+        {!imageError ? (
+          <Image
+            src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d2_Group%209969.webp"
+            alt="ROAS Calculator visualization"
+            fill
+            sizes="(max-width: 991px) 100vw, (max-width: 1439px) 54vw, 766px"
+            priority
+            onError={() => setImageError(true)}
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-r from-[#46A6FF] to-[#005FB8] opacity-60 rounded-r-md"></div>
+        )}
       </div>
 
       <div className="flex flex-col justify-between z-[3] relative w-[100%] mt-8 lg:mt-0">
@@ -128,11 +136,19 @@ export default function Calculator() {
           <span className="mr-2 lg:mr-3 text-[24px] lg:text-[32px] font-medium leading-[30px] lg:leading-[38px] text-white">
             With
           </span>
-          <img
-            src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d1_brandmark%20logo.svg"
-            alt="OneTrack"
-            className="h-[20px] lg:h-[25px]"
-          />
+          {!logoError ? (
+            <Image
+              src="https://cdn.prod.website-files.com/6596ccfbb3d9754c38fb8e60/6596da5dc1170c5d925c93d1_brandmark%20logo.svg"
+              alt="OneTrack"
+              width={100}
+              height={25}
+              className="h-[20px] lg:h-[25px] w-auto"
+              onError={() => setLogoError(true)}
+              unoptimized
+            />
+          ) : (
+            <span className="text-[20px] font-bold text-white">OneTrack</span>
+          )}
         </div>
 
         <div className="grid grid-rows-3 gap-2 w-full">
