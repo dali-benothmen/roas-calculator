@@ -10,6 +10,10 @@ A modern, interactive ROAS (Return on Investment) calculator built with Next.js 
 - **Responsive Design**: Fully responsive for all device sizes
 - **Accessibility**: ARIA-compliant interactive elements
 
+## Live Demo
+
+Try out the ROAS Calculator: [https://roas-calculator-fn76.vercel.app/](https://roas-calculator-fn76.vercel.app/)
+
 ## Installation
 
 ### Prerequisites
